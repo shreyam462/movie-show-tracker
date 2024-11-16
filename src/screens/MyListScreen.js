@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     FlatList,
@@ -6,20 +6,42 @@ import {
     StyleSheet,
     RefreshControl,
     ActivityIndicator,
+    Alert,
 } from 'react-native';
-import { AppContext } from '../contexts/AppContext';
 import GridToggle from '../components/GridToggle';
 import MovieCard from '../components/MovieCard';
+import { fetchMyList } from '../services/api'; // Import the API function
 
 const MyListScreen = ({ navigation }) => {
-    const { myList } = useContext(AppContext); // Fetch Watched and To Watch lists from context
+    const [myList, setMyList] = useState({ Watched: [], ToWatch: [] });
+    const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [isGrid, setIsGrid] = useState(false);
 
-    const onRefresh = () => {
+    const getMyList = async () => {
+        try {
+            setLoading(true);
+            const data = await fetchMyList(); // Fetch the list from the API
+            setMyList({
+                Watched: data.Watched,
+                ToWatch: data['To Watch'],
+            });
+        } catch (error) {
+            console.error('Error fetching my list:', error);
+            Alert.alert('Error', 'Failed to fetch the list. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getMyList();
+    }, []);
+
+    const onRefresh = async () => {
         setRefreshing(true);
-        // Simulate refresh (replace with actual API call if needed)
-        setTimeout(() => setRefreshing(false), 1000);
+        await getMyList(); // Refresh the list
+        setRefreshing(false);
     };
 
     const renderList = (title, data) => (
@@ -29,11 +51,15 @@ const MyListScreen = ({ navigation }) => {
                 data={data}
                 key={isGrid ? 'grid' : 'list'}
                 numColumns={isGrid ? 2 : 1}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item.movieId.toString()}
                 renderItem={({ item }) => (
                     <MovieCard
-                        movie={item}
-                        onPress={() => navigation.navigate('Details', { id: item.id })}
+                        movie={{
+                            id: item.movieId,
+                            title: item.title,
+                            poster_url: item.poster_url,
+                        }}
+                        onPress={() => navigation.navigate('Details', { id: item.movieId })}
                         isGrid={isGrid}
                     />
                 )}
@@ -44,14 +70,23 @@ const MyListScreen = ({ navigation }) => {
         </>
     );
 
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" />
+                <Text>Loading your list...</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             {/* Grid/List Toggle */}
             <GridToggle isGrid={isGrid} onToggle={() => setIsGrid((prev) => !prev)} />
 
             {/* Render Watched and To Watch Lists */}
-            {renderList('Watched', myList.watched)}
-            {renderList('To Watch', myList.toWatch)}
+            {renderList('Watched', myList.Watched)}
+            {renderList('To Watch', myList.ToWatch)}
         </View>
     );
 };
@@ -66,6 +101,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginVertical: 16,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

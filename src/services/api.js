@@ -11,12 +11,15 @@ export const fetchMovieDetails = (id) =>
     axios.get(`${API_BASE}/movies`, { params: { id } });
 
 // Fetch user's My List (Watched and To Watch)
-export const fetchMyList = () =>
-    axios.get(`${API_BASE}/mylist`);
+export const fetchMyList = async () => {
+    const response = await axios.get(`${API_BASE}/mylist`);
+    return response.data;
+};
 
 // Add a movie to "My List" with a specific status
-export const addToMyList = (movieId, status) =>
-    axios.post(`${API_BASE}/mylist/add`, {
-        movieId,
-        status,
+export const addToMyList = (movieId, status) => {
+    return axios.post(`${API_BASE}/mylist/add`, {
+        movie_id: movieId,
+        status, // 'Watched' or 'To Watch'
     });
+}
