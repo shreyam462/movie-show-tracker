@@ -101,29 +101,35 @@ The app uses the following **RapidMock API** endpoints:
 
 ### Home Screen
 
-![Home Screen](screenshots/home.png)
+![Home Screen](./media/Home1.jpg)
+![Home Screen](./media/Home2.jpg)
+![Home Screen](./media/Home3.jpg)
+![Home Screen](./media/Home4.jpg)
+![Home Screen](./media/Home5.jpg)
 
 ### My List Screen
 
-![My List Screen](screenshots/mylist.png)
+![My List Screen](./media/MyList1.jpg)
+![My List Screen](./media/MyList2.jpg)
 
 ### Details Screen
 
-![Details Screen](screenshots/details.png)
+![Details Screen](./media/Details1.jpg)
+![Details Screen](./media/Details2.jpg)
 
 ---
 
 ## **APK**
 
 Download the APK to install and test the app on your Android device:
-- [Download APK](https://example.com/download/apk)
+- [Download APK](https://drive.google.com/file/d/1zCwMaRwJRYRxB7JeDhUeXr-lVXqWai60/view?usp=drive_link)
 
 ---
 
 ## **Video Demonstration**
 
 Watch a video demonstration showcasing the main flows and features of the app:
-- [Watch Video](https://example.com/demo/video)
+- [Watch Video](https://drive.google.com/file/d/1JQcXGPc-CQzheDLzJd0Yo9XttQRPP-KF/view?usp=drive_link)
 
 ---
 

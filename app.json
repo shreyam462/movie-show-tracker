@@ -16,7 +16,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.example.movieshowtracker", 
+      "package": "com.example.movieshowtracker",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -26,6 +26,15 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "platforms": ["android", "ios", "web"]
+    "platforms": [
+      "android",
+      "ios",
+      "web"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "5faed8ac-24a2-4ff1-9ce9-d2ef2d9d6328"
+      }
+    }
   }
 }
