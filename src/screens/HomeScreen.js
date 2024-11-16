@@ -7,11 +7,12 @@ import {
     ActivityIndicator,
     RefreshControl,
     Alert,
-    Text, // Import Text here
+    TouchableOpacity,
+    Text,
 } from 'react-native';
-import { fetchMovies } from '../services/api'; // Ensure this API function exists
-import GridToggle from '../components/GridToggle'; // Ensure this component is implemented
-import MovieCard from '../components/MovieCard'; // Ensure this component is implemented
+import { fetchMovies } from '../services/api'; // API function to fetch movies
+import GridToggle from '../components/GridToggle'; // Grid/List toggle component
+import MovieCard from '../components/MovieCard'; // MovieCard component
 
 const HomeScreen = ({ navigation }) => {
     const [movies, setMovies] = useState([]);
@@ -20,6 +21,8 @@ const HomeScreen = ({ navigation }) => {
     const [isGrid, setIsGrid] = useState(false);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [isSorted, setIsSorted] = useState(false); // Tracks sorting state
+    const [filterType, setFilterType] = useState(null); // Tracks filter: 'movie', 'show', or null
 
     const getMovies = async () => {
         try {
@@ -41,17 +44,49 @@ const HomeScreen = ({ navigation }) => {
 
     const onRefresh = async () => {
         setRefreshing(true);
-        await getMovies(); // Refresh the movies by re-fetching them
+        await getMovies(); // Refresh the movies
         setRefreshing(false);
     };
 
     const handleSearch = (query) => {
         setSearchQuery(query);
-        setFilteredMovies(
-            movies.filter((movie) =>
-                movie.title.toLowerCase().includes(query.toLowerCase())
-            )
-        );
+        applyFilters(query, filterType); // Apply search and filter together
+    };
+
+    const handleSort = () => {
+        if (isSorted) {
+            // Undo sort: reset to original list
+            applyFilters(searchQuery, filterType, [...movies]);
+            setIsSorted(false);
+        } else {
+            // Sort the list alphabetically
+            setFilteredMovies((prev) =>
+                [...prev].sort((a, b) => a.title.localeCompare(b.title))
+            );
+            setIsSorted(true);
+        }
+    };
+
+    const handleFilter = (type) => {
+        const newFilter = filterType === type ? null : type; // Toggle the filter
+        setFilterType(newFilter);
+        applyFilters(searchQuery, newFilter); // Apply search and filter together
+    };
+
+    const applyFilters = (search, filter, baseMovies = movies) => {
+        let filtered = baseMovies;
+
+        if (search) {
+            filtered = filtered.filter((movie) =>
+                movie.title.toLowerCase().includes(search.toLowerCase())
+            );
+        }
+
+        if (filter) {
+            filtered = filtered.filter((movie) => movie.type === filter);
+        }
+
+        setFilteredMovies(filtered);
     };
 
     return (
@@ -59,10 +94,40 @@ const HomeScreen = ({ navigation }) => {
             {/* Search Bar */}
             <TextInput
                 style={styles.input}
-                placeholder="Search movies..."
+                placeholder="Search movies and shows..."
                 value={searchQuery}
                 onChangeText={handleSearch}
             />
+
+            {/* Sort and Filter Buttons */}
+            <View style={styles.buttonsContainer}>
+                <TouchableOpacity
+                    style={[styles.filterButton, isSorted && styles.activeButton]}
+                    onPress={handleSort}
+                >
+                    <Text style={styles.buttonText}>
+                        {isSorted ? 'Sort A-Z' : 'Sort A-Z'}
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[
+                        styles.filterButton,
+                        filterType === 'movie' && styles.activeButton,
+                    ]}
+                    onPress={() => handleFilter('movie')}
+                >
+                    <Text style={styles.buttonText}>Movies</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[
+                        styles.filterButton,
+                        filterType === 'show' && styles.activeButton,
+                    ]}
+                    onPress={() => handleFilter('show')}
+                >
+                    <Text style={styles.buttonText}>Shows</Text>
+                </TouchableOpacity>
+            </View>
 
             {/* Grid/List Toggle */}
             <GridToggle isGrid={isGrid} onToggle={() => setIsGrid((prev) => !prev)} />
@@ -107,6 +172,26 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 5,
         marginBottom: 16,
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    filterButton: {
+        flex: 1,
+        paddingVertical: 10,
+        marginHorizontal: 4,
+        backgroundColor: '#ccc',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    activeButton: {
+        backgroundColor: '#007bff',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
     },
     loadingContainer: {
         flex: 1,

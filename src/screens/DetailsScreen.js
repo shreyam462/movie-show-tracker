@@ -30,10 +30,10 @@ const DetailsScreen = ({ route, navigation }) => {
     const handleStatusChange = (status) => {
         if (selectedStatus === status) {
             setSelectedStatus(null);
-            Alert.alert('Status Updated', 'Movie status cleared.', [{ text: 'OK' }]);
+            Alert.alert('Status Updated', 'Removed from list.', [{ text: 'OK' }]);
         } else {
             setSelectedStatus(status);
-            Alert.alert('Status Updated', `Movie marked as "${status}".`, [{ text: 'OK' }]);
+            Alert.alert('Status Updated', `Added to "${status}" List.`, [{ text: 'OK' }]);
         }
     };
 
